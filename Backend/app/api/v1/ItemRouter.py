@@ -1,7 +1,8 @@
 from fastapi import APIRouter,Depends
 import redis
-from schemas.Item import Item
-from crud.ItemCRUD import ItemCRUD
+from app.core.database import get_redis
+from app.schemas.Item import Item
+from app.crud.ItemCRUD import ItemCRUD
 from redis.asyncio import Redis
 
 router = APIRouter()
@@ -28,3 +29,9 @@ async def delete_item(item_id: str):
     item_crud = ItemCRUD(redis_client)
     await item_crud.delete_item(item_id)
     return {"message": "Item deleted successfully!"}
+@router.get("/items/")
+async def read_all(redis=Depends(get_redis)):
+    crud = ItemCRUD(redis)
+    items = await crud.list_items()
+    # Trả về danh sách list các object cho Frontend
+    return items

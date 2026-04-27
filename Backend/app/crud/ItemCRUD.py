@@ -1,5 +1,5 @@
 from redis.asyncio import Redis
-from schemas.Item import Item
+from app.schemas.Item import Item
 class ItemCRUD:
     def __init__(self, redis_client: Redis):
         self.redis = redis_client
@@ -22,3 +22,11 @@ class ItemCRUD:
 
     async def delete_item(self, item_id: str):
         await self.redis.delete(f"item:{item_id}")
+    async def list_items(self):
+        keys = await self.redis.keys("item:*")
+        items = []
+        for key in keys:
+            item_data = await self.redis.hgetall(key)
+            if item_data:
+                items.append(Item(**item_data))
+        return items

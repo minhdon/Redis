@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 class Item(BaseModel):
-    name: str
+    category: str
+    title: str
+    price: str
+    image: str
     description: str
-    price: float
-    tax: float = None

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.v1 import ItemRouter
+from app.api.v1 import ItemRouter
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
