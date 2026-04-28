@@ -36,25 +36,30 @@ const ProductForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Nếu tạo mới, gọi POST. Nếu sửa, gọi PUT
     const url = isEditMode
       ? `http://127.0.0.1:8000/api/v1/items/${id}`
-      : "http://127.0.0.1:8000/api/v1/items/";
+      : `http://127.0.0.1:8000/api/v1/items/${formData.id}`;
 
     const method = isEditMode ? "PUT" : "POST";
+
+    // Tách id ra khỏi dữ liệu gửi đi
+    const { id: _, ...dataToSend } = formData;
 
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend), // Gửi data đã bỏ id
       });
 
       if (response.ok) {
         alert(isEditMode ? "Cập nhật thành công!" : "Tạo mới thành công!");
-        navigate("/"); // Quay về trang chủ
+        navigate("/");
       } else {
-        alert("Có lỗi xảy ra từ Server!");
+        // Log lỗi chi tiết để biết Server đang mắng gì
+        const errorData = await response.json();
+        console.error("Server Error:", errorData);
+        alert(`Lỗi: ${errorData.detail || "Có lỗi xảy ra từ Server!"}`);
       }
     } catch (error) {
       alert("Không thể kết nối đến server.");
@@ -106,7 +111,7 @@ const ProductForm: React.FC = () => {
         <div className={styles.formGroup}>
           <label>Giá (Price):</label>
           <input
-            type="number"
+            type="text"
             name="price"
             required
             value={formData.price}
